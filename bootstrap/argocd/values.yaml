@@ -1,0 +1,8 @@
+# Argo CD Helm values for local kind cluster
+
+dex:
+  enabled: false
+
+configs:
+  params:
+    server.insecure: true
