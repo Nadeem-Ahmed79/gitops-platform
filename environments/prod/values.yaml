@@ -5,3 +5,7 @@ replicaCount: 3
 ui:
   message: "Hello from Nadeem-Ahmed (PROD)"
   color: "#34577c"
+
+
+rollout:
+  enabled: true
