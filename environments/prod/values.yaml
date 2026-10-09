@@ -13,3 +13,6 @@ rollout:
 
 image:
   tag: "6.15.0"
+
+image:
+  tag: "6.99.0"
