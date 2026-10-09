@@ -9,3 +9,7 @@ ui:
 
 rollout:
   enabled: true
+
+
+image:
+  tag: "6.15.0"
