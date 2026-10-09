@@ -1,15 +1,20 @@
-{{- if not .Values.rollout.enabled }}
-apiVersion: apps/v1
-kind: Deployment
+{{- if .Values.rollout.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: {{ .Release.Name }}
   labels:
     {{- include "podinfo.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 3
   selector:
     matchLabels:
       {{- include "podinfo.selectorLabels" . | nindent 6 }}
   template:
     {{- include "podinfo.podTemplate" . | nindent 4 }}
+  strategy:
+    canary:
+      steps:
+        {{- toYaml .Values.rollout.steps | nindent 8 }}
 {{- end }}

@@ -34,3 +34,13 @@ securityContext:
   capabilities:
     drop:
       - ALL
+
+
+rollout:
+  enabled: false
+  steps:
+    - setWeight: 33
+    - pause: {}
+    - setWeight: 66
+    - pause:
+        duration: 30s
