@@ -1,0 +1,7 @@
+# prod environment: overrides on top of charts/podinfo/values.yaml
+
+replicaCount: 3
+
+ui:
+  message: "Hello from Nadeem-Ahmed (PROD)"
+  color: "#34577c"

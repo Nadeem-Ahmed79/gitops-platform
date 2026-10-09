@@ -1,0 +1,7 @@
+# dev environment: overrides on top of charts/podinfo/values.yaml
+
+replicaCount: 1
+
+ui:
+  message: "Hello from Nadeem-Ahmed (DEV)"
+  color: "#2e7d32"

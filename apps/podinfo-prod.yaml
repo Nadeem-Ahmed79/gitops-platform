@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: podinfo
+  name: podinfo-prod
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -13,9 +13,11 @@ spec:
     path: charts/podinfo
     helm:
       releaseName: podinfo
+      valueFiles:
+        - ../../environments/prod/values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: podinfo
+    namespace: podinfo-prod
   syncPolicy:
     automated:
       prune: true
