@@ -11,7 +11,7 @@ service:
   port: 9898
 
 ui:
-  message: "Hello from GitOps Platform"
+  message: "Hello from Nadeem-Ahmed"
   color: "#34577c"
 
 resources:
