@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  HELM_VERSION: v3.22.0
+  KUBECONFORM_VERSION: v0.8.0
+  CONFTEST_VERSION: 0.71.1
+  CRD_SCHEMAS: "https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json"
+
+jobs:
+  validate-chart:
+    name: Validate podinfo (${{ matrix.env }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [dev, prod]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - name: Install kubeconform and conftest
+        run: |
+          curl -sL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" | tar xz kubeconform
+          curl -sL "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz" | tar xz conftest
+          sudo mv kubeconform conftest /usr/local/bin/
+
+      - name: Helm lint
+        run: helm lint charts/podinfo -f environments/${{ matrix.env }}/values.yaml
+
+      - name: Render manifests
+        run: helm template podinfo charts/podinfo -f environments/${{ matrix.env }}/values.yaml > rendered.yaml
+
+      - name: Schema validation
+        run: kubeconform -strict -summary -schema-location default -schema-location "$CRD_SCHEMAS" rendered.yaml
+
+      - name: Policy checks
+        run: conftest test rendered.yaml
+
+  validate-argocd-apps:
+    name: Validate Argo CD Applications
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install kubeconform
+        run: |
+          curl -sL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" | tar xz kubeconform
+          sudo mv kubeconform /usr/local/bin/
+
+      - name: Schema validation
+        run: kubeconform -strict -summary -schema-location default -schema-location "$CRD_SCHEMAS" apps/ bootstrap/root-app.yaml
